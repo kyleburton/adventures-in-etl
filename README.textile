@@ -1,4 +1,4 @@
-.h1 Adventures in ETL - Looking up from tne Mezzanine of ETL
+h1. Adventures in ETL - Looking up from tne Mezzanine of ETL
 
 Being a programmer in the 21st century, you've been exposed to databases and the trasnfer of data both out of (the easy part) and into (not as easy asa we think) our applications.  
 
@@ -13,6 +13,66 @@ This talk is about my experiences with all those files, formats and processing t
 5. Relational Data Model Mapping
 6. There is no Spoon : How to top worrying and Love Ontological Mapping Techniques
 
-.h1 Outline
+h1. Outline
 
+Start with the lowest level, move up one conceptual level at a time.
+
+* Files: Blobs of Binary Data Sitting on Disk
+** Encoding: Streams of Characters
+  By far the most common format I had to deal with was basic ascii represented as 8-bit characters, which
+  is in fact, equivalent to Latin-X.  The next most common was Latin-15 (ISO-8859-15), allowing for other
+  common western language's extended character sets.
+*** ASCII
+*** utf-8
+*** Latin-X
+*** EBCDIC
+** First recognition of structure: lines or records (record delmiter / fixed record size)
+*** record delimiters are not consistent
+*** record delimiters are embedded in the data
+*** sometimes there are _no_ record separators
+** Second recognition of structure: fields / columns
+*** Headers may not be present
+**** this means you have to specify them as part of the descriptor for the source
+** Keys
+*** Surprise!: keys
+*** sometimes not present (!)
+*** sometimes documentation is 'wrong'
+**** specify the key they used
+**** but file is a de-normalized dump of primary source
+**** key no longer unique
+**** complicates your import
+**** simple analyiss tricks for determining the uniqueness of a key column
+*** Simple analysis tricks and tools for getting a feel for the data
+**** cut | sort | uniq -c | wc -l
+**** cut | sort | uniq -c | sort -nr
+**** abtab_view
+**** abtab_historgram
+
+* Developing a Taxonomy and A Descriptor Schema For Files that represent Tables
+** One Column must become Many (hard)
+** Many Columns must become One (easier)
+** Data type must change: 
+*** numeric: fairly straightforward
+*** enumerated values
+**** coding tables
+**** did the vendor supply one?
+**** does their data actualy match the documentation? (extra / missing / unused values?)
+**** strategies for recognizing what's present
+**** strategies for handling the mapping
+**** strategies for modeling your own standardized lookup tables
+***** be as specific as possible, things are much easier on you if your LU tables are a super-set of all your inputs
+***** or if not, in addition to mapping, pass-through the original data for re-analysis later
+** Computed Values, precision, accuracy
+*** searching to determining the min/max/avg precision
+*** currency
+*** lon/lat
+
+* Data Models
+** Each file is a table
+** Join key as single column
+** Join key as tuple (multiple columns)
+** Join key as computed composite
+** Suprise!: 1-1 table relations based on record position (ugh)
+
+* The great tragedy : loss of data
 
