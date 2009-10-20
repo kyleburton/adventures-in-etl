@@ -75,4 +75,9 @@ Start with the lowest level, move up one conceptual level at a time.
 ** Suprise!: 1-1 table relations based on record position (ugh)
 
 * The great tragedy : loss of data
+** as you transform, be prescient of what you discard
+** you can't get it back
+** if space is cheap for you, carry forward, or better yet deferr
+
+* Consolidation
 
