@@ -1,0 +1,18 @@
+.h1 Adventures in ETL - Looking up from tne Mezzanine of ETL
+
+Being a programmer in the 21st century, you've been exposed to databases and the trasnfer of data both out of (the easy part) and into (not as easy asa we think) our applications.  
+
+I had some exposure to a wide taxonomy of file formats and relational data models at a data integration company.  
+
+This talk is about my experiences with all those files, formats and processing them en mass.  The ways in which we diverged a bit from the standard model of ETL and some of the tools and approaches we used to wrangle all that data.
+
+1. The era of table stores
+2. Relational Databases
+3. Reporting Systems Co-opted as Export tools
+4. Import / Export tools
+5. Relational Data Model Mapping
+6. There is no Spoon : How to top worrying and Love Ontological Mapping Techniques
+
+.h1 Outline
+
+
