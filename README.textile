@@ -1,4 +1,4 @@
-h1. Adventures in ETL - Looking up from tne Mezzanine of ETL
+h1. Adventures in ETL - Looking up from the Mezzanine of ETL
 
 Being a programmer in the 21st century, you've been exposed to databases and the trasnfer of data both out of (the easy part) and into (not as easy asa we think) our applications.  
 
@@ -81,3 +81,10 @@ Start with the lowest level, move up one conceptual level at a time.
 
 * Consolidation
 
+
+h2. Talk about how much data we used to process
+
+* >2k+ Different Relational Data Models
+* Tens of Thousands of Snapshots
+* billions of records
+* all for ~5 million 'entities'
