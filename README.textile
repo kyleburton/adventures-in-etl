@@ -1,8 +1,8 @@
 h1. Adventures in ETL - Looking up from the Mezzanine of ETL
 
-Being a programmer in the 21st century, you've been exposed to databases and the trasnfer of data both out of (the easy part) and into (not as easy asa we think) our applications.  
+Being a programmer in the 21st century, you've been exposed to databases and the trasnfer of data both out of (the easy part) and into (not as easy asa we think) our applications.
 
-I had some exposure to a wide taxonomy of file formats and relational data models at a data integration company.  
+I had some exposure to a wide taxonomy of file formats and relational data models at a data-integration company.
 
 This talk is about my experiences with all those files, formats and processing them en mass.  The ways in which we diverged a bit from the standard model of ETL and some of the tools and approaches we used to wrangle all that data.
 
@@ -11,11 +11,46 @@ This talk is about my experiences with all those files, formats and processing t
 3. Reporting Systems Co-opted as Export tools
 4. Import / Export tools
 5. Relational Data Model Mapping
-6. There is no Spoon : How to top worrying and Love Ontological Mapping Techniques
+6. There is no Spoon : How to stop worrying and Love Ontological Mapping Techniques
 
 h1. Outline
 
-Start with the lowest level, move up one conceptual level at a time.
+h2. What is ETL?
+
+Extract, Transform, Load
+
+The goal is to take a data set from one system and load it into another system where there are likely to be significant differences in how the two systems store, model and otherwise represent their data.
+
+Extract data from a system (be they text files, a database dump, or other propreitary format), transform them into a form which can be understood (loaded) into the target system (change the encoding, data types, standardize values, morph the data model).
+
+Most of this talk is going to focus on the movement of relationaly modeled data, tables of records with foreign key relationships, though ETL does not necessarily imply relationally modeled data.  Many of the tools that will be discussed were designed specifically to deal with this type of data.
+
+h2. My own Experience with Data Integration
+
+My programming career started at a 401k benefits managment company, my job was to take a flat-file export from a Unisys main-frame and load it into an Integrated Voice Response system where customers could use a phone to check their balances and change their allocations.
+
+Little did I know at the time of what was to come...
+
+More recently I worked for a company that did larger scale data integration.  At that company we were integrating thousands of independent data sources into a single consolidated master file of data.  These were acquired in a wide variety of ways: assets purchased from companies that had gone out of business, public domain sources, government agencies, other data providers and even our own customers in reciprocial agreements.
+
+In nearly all cases we had very little influence on how we received the data, most often the sending party did not have the resources or expertise, or we did not wish to pay the preimium, to have them adapt their export processes to our input format or data model.
+
+Early on we didn't have a data model anyway.
+
+We needed to load tens to hundreds of sources a day, where a source was a snapshot of an input database.  Some of these were to be incorporeated into the master file, some were customer data integration jobs - to enhance their data and produce a deliverable back.
+
+We were a start-up and could not afford to purchase expensive ETL software, nor could we afford to staff up a large number of highly skilled (and expensive) database developers to perform the data transformation and loading process.
+
+What we ended up doing was thinking a bit differently about the different facets of ETL and creating tools that allowed us to leverage technical anlysts to perform the ETL mapping, without requiring programming skills, or significant amounts of training.
+
+
+h2. Start with the lowest level, move up one conceptual level at a time.
+
+* Files: Blobs of Binary Data Sitting on Disk
+* Records: Delimited or Fixed Width
+* Feilds: Simple Delimited, Complex Delimited, Fixedwidth
+* Model: types, validation and meaning from a text dump
+
 
 * Files: Blobs of Binary Data Sitting on Disk
 ** Encoding: Streams of Characters
@@ -51,7 +86,7 @@ Start with the lowest level, move up one conceptual level at a time.
 * Developing a Taxonomy and A Descriptor Schema For Files that represent Tables
 ** One Column must become Many (hard)
 ** Many Columns must become One (easier)
-** Data type must change: 
+** Data type must change:
 *** numeric: fairly straightforward
 *** enumerated values
 **** coding tables
