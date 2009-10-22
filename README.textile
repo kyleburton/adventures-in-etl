@@ -17,6 +17,16 @@ h1. Aaron's ETL Outline
 
   There are challgenges in data model incongruencies, the formatting of values, the proper identification of data and types, the accuracy and consisteny of the export from the source system, and more. {{{ what else? }}}
 
+    Relational databases often require closely tracked foreign Key {re}construction during the import process.  This leads to multi-step ETL processes where the initial data is bulk imported, then primary entites enumerated, then multiple rounds of join / updates are performed to propigate the primary keys.  Once all the data has been staged and stitched together in this way, then the final table imports are performed -- or constraints are re-enabled and indexes rebuilt.
+
+    We found that that traditional methodology lead to a high degree of analysis before hand (to ensure we understood the data, how to model it and how to transform it), a complex to build and complex to maintain ETL process (especially in the face of input sources that would change format over time, and a high volume of different data sets).
+
+    We found that traditional ETL approaches and processing lead us into expending a lot of effort on each ETL mapping, opaque processes that did not provide good feedback about progress, brittle processes that did not tolerate data inconsistencies well (often enough to handle a handful of errors, either an entire process needed to be restarted from early on, or the correction of that handful had to be done as a one-off that was not able to effectively be made into a formalized part of the ETL processing - often leading to manual process being instutionalized into the ETL processing).
+
+    {{{ Need to expand on this more }}} The way we did consolidation was also something that fed into our choices here.
+
+  Oracle's SQL Loader, Mysql's 'COPY INFILE', MS Access's import features.
+
 * ETL @ HMS
 ** what type of problem was being solved?
 ** data volume
