@@ -25,10 +25,15 @@ h1. Aaron's ETL Outline
 
     {{{ Need to expand on this more }}} The way we did consolidation was also something that fed into our choices here.
 
-  Oracle's SQL Loader, Mysql's 'COPY INFILE', MS Access's import features.
+  Oracle's SQL Loader, Mysql's 'COPY INFILE', MS Access's import features.  Commercial Tools: Altova MapForce, Informatica, Oracle's ODI (Oracle Data Integrator).
 
-* ETL @ HMS
+* ETL @ The Data Integration Company
 ** what type of problem was being solved?
+
+  We were building a master file of health care practitioner demographic data.  The philosophy was to create this out of as many independent sources of information we could obtain.Some sources covered different specialties, some covered different attributes, some were more timely, some were more accurate.  By consolidating all of these sources, and tracking quality metrics on all the attributes, the goal was to create a single view of the truth represented by all of those data sources.  
+
+ Multiple Dimensions: attributes (horizontal), coverage / comprehensiveness, accuracy of data alues (independent observation, and contrasting sources against each toher - determining derivation relationships), time (repeated observation and trending).
+
 ** data volume
 ** data source type
 ** speed ETL
