@@ -1,10 +1,47 @@
-h1. Adventures in ETL - Looking up from the Mezzanine of ETL
+h1. Adventures in Data - Looking up from the Mezzanine of ETL
 
-Being a programmer in the 21st century, you've been exposed to databases and the trasnfer of data both out of (the easy part) and into (not as easy asa we think) our applications.
+Being a programmer in the 21st century you've been exposed to databases and the transfer of data both out of (the easy part) and into (not as easy as we think) our applications.
 
-I had some exposure to a wide taxonomy of file formats and relational data models at a data-integration company.
+I was exposed to the world of ETL during my time at a Philladelphia area data integration company.  We had to deal with a wide variety of file formats and relational data models.
 
-This talk is about my experiences with all those files, formats and processing them en mass.  The ways in which we diverged a bit from the standard model of ETL and some of the tools and approaches we used to wrangle all that data.
+{{{ need more references }}} 
+ETL (Extract, Transform, Load) is a blanket term for the processes and tools used to export data from one system and import it into another.
+
+This talk is about my experiences with all those files, formats and processing them en masse.  The ways in which we diverged a bit from the standard model of ETL and some of the tools and approaches we used to wrangle all that data.
+
+
+h1. Aaron's ETL Outline
+
+* What is ETL
+  ETL (Extract, Transform, Load) is the blanket term for the tools and processes used to export data from one system and import them into antoher.  This typicall manifests itself as a dump of the source system's data base, a process to make the data model and values compatible with a target system and an import process to get the data into the target system.
+
+  There are challgenges in data model incongruencies, the formatting of values, the proper identification of data and types, the accuracy and consisteny of the export from the source system, and more. {{{ what else? }}}
+
+* ETL @ HMS
+** what type of problem was being solved?
+** data volume
+** data source type
+** speed ETL
+** frequency of ETL
+** technique or tool(s) used for ETL
+** describe the evolution of the current tool(s)
+*** what did you guys used to do?
+*** how did you guys arrive at the current approach?
+** how long did it take to develop the initial version of the tool(s)
+** who were the end users of the tool(s)
+* Exploratory ETL process via configuration
+** ability to configure during runtime
+** visually inspect data while it is being processed
+* Abstract Table Tools
+** How do they work
+** What data sources could they handle (source, and destination)
+** Syntax
+** How is transformation being handled?
+** How does it handle the following scenarios:
+*** one-to-one (trivial)
+*** one-to-many - one record becomes multiple records
+*** many-to-many - one logical record from multiple tables into multiple tables
+* Tools can be chained as needed
 
 1. The era of table stores
 2. Relational Databases
@@ -43,6 +80,30 @@ We were a start-up and could not afford to purchase expensive ETL software, nor 
 
 What we ended up doing was thinking a bit differently about the different facets of ETL and creating tools that allowed us to leverage technical anlysts to perform the ETL mapping, without requiring programming skills, or significant amounts of training.
 
+We even saw a not insignificant amount of data errors or corruption - we had optical media from defunct companies that had bit level errors.  The data was valueable enought that we worked to correct and accomodate those kinds of errors in our system.
+
+h3. Data Volumes
+
+We dealt with tens to hundreds of database snapshots a day.  These sources would be up to several million records each.  The entire system maintained billions of records of data, connected to about five million entities.
+
+h3. Data Formats
+
+* Text Formats:
+** Structured
+*** Fixed Width
+**** Record Separators optional
+**** Padding
+**** Often Not Self-describing (no header row)
+**** Packed Fields, more than 1 value in a field (delimited within fixed width)
+**** Mis-fielded Data
+**** 'Somewhat fixed' - data overrunning into adjacent fields
+*** Delimited
+**** Name for the 'well formed delimted' like tab/pipe?
+**** Name for the 'complex delimited' like CSV?
+** SemiStructured
+*** PDF Files
+*** HTML Pages
+*** Legal Proceedings
 
 h2. Start with the lowest level, move up one conceptual level at a time.
 
