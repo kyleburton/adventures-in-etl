@@ -1,13 +1,34 @@
-h1. Adventures in Data - Looking up from the Mezzanine of ETL
+h1. Adventures in Data - Looking up from the Mezzanine of Data Warehousing
 
-Being a programmer in the 21st century you've been exposed to databases and the transfer of data both out of (the easy part) and into (not as easy as we think) our applications.
+If you've worked with relational databases at all, you've likely had to export data from them, and import data into them.  We do this to back dat up, to migrate data sets from one version of our application to another, for replication, and as part of the normal operation of our systems.  You are surrounded by ETL.
 
-I was exposed to the world of ETL during my time at a Philladelphia area data integration company.  We had to deal with a wide variety of file formats and relational data models.
+I was personally thrown deep into the world of ETL during my time at a Philladelphia area staart up who's core focus was data integration.  At that company had to deal with, what was at the time, a vast amount of ETL.  Being a start up, we couldn't afford commercial tools and embarked on creating our own.
 
-{{{ need more references }}} 
-ETL (Extract, Transform, Load) is a blanket term for the processes and tools used to export data from one system and import it into another.
+This talk is about my experiences developing those tools and how we used them to process data en masse.  I'll discuss how I feel we diverged from the standard model of ETL and what we feel the trade offs were.
 
-This talk is about my experiences with all those files, formats and processing them en masse.  The ways in which we diverged a bit from the standard model of ETL and some of the tools and approaches we used to wrangle all that data.
+h1. What is ETL?
+
+{{{ need more references : wikipedia has a good overview of ETL }}}
+
+ETL is an acronym for: Extract, Transform and Load.  It is a blanket term for the tools, processes, and techniques used to export data from one system, cleanse and reformat it, and finally import it into a target sysetm.
+
+h1. The Problem: Circa 1999
+
+The initial core product of the data integration company was a national (US) master file of demographic data on healthcare practitioners.  The founder's idea was that you could builtd a more comprehensive, accurate master data set by combining as many independent sources of data as possible - each one providing more attirbutes, or more of a confirmation of the data values from the other sources.  The more sources agreed that a particular attriubte was correct (eg: first name), the higher the probability that the value was actually correct.
+
+He had created the first data sets out of a handful of data bases that he had purchased and integrated together using a combination of table joins in Microsoft Access augmented by cleansing and parsing he did by hand with a mouse and cut&paste.  It was humbling to see how quickly he could manipulate data by hand with MS Access.
+
+After having good success creating an initial data set by hand, and realizing that he could acheive significantly better results by acquirning and integrating vastly larger data sets, he founded the data integration company with the express purpose of developing software to perform the data ingtegration.
+
+Data sets had to be purchased, and employees be hired - this left little capital early on for buying commercial ETL and data integration tools, which were prohibitivly expensive for us as a start up (hundreds of thousands to millions of dollars).
+
+h2. Data Sources
+
+Not all of the software was developed at once.  At about the five year mark, we had managed to create a system that integrated several thousand databases, representing several hundred relational data models.
+
+We had initially started with what we saw as the traditionall ETL approaches: have developers create 'sql loader' import configurations (we tried Oracle, SQL Server, and MySQL's tools); have developers create custom perl or VB import programs; or have an analyst try to create import processes using MS Access.  What we found was that we had very little influence over the data providers and the format they would send to us; many of the data providers we were receiving data from changed their formats much more frequently than we had anticipated (leading to high maintenence on the customized ETL processes); we were continually improving our understanding of the data we were creating and this was feeding back into how we were doing ETL on the data we were receiving - we realized that as we better understood the data, that we could improve our master-file's comprehensiveness and accuracy by improving how we cleansed and mapped the input sources.
+
+As we started in that first year, the realization dawned on us that having developers perform the ETL did not scale well, nor was it going to be cost effective.  We wanted to re-define ETL so that people who were, though still technical, not necessarily full on software developers.  At that point we began to focus on that as a core problem in addition to data integration.
 
 
 h1. Aaron's ETL Outline
@@ -30,7 +51,7 @@ h1. Aaron's ETL Outline
 * ETL @ The Data Integration Company
 ** what type of problem was being solved?
 
-  We were building a master file of health care practitioner demographic data.  The philosophy was to create this out of as many independent sources of information we could obtain.Some sources covered different specialties, some covered different attributes, some were more timely, some were more accurate.  By consolidating all of these sources, and tracking quality metrics on all the attributes, the goal was to create a single view of the truth represented by all of those data sources.  
+  We were building a master file of health care practitioner demographic data.  The philosophy was to create this out of as many independent sources of information we could obtain.Some sources covered different specialties, some covered different attributes, some were more timely, some were more accurate.  By consolidating all of these sources, and tracking quality metrics on all the attributes, the goal was to create a single view of the truth represented by all of those data sources.
 
  Multiple Dimensions: attributes (horizontal), coverage / comprehensiveness, accuracy of data alues (independent observation, and contrasting sources against each toher - determining derivation relationships), time (repeated observation and trending).
 
