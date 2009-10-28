@@ -31,6 +31,26 @@ We had initially started with what we saw as the traditionall ETL approaches: ha
 As we started in that first year, the realization dawned on us that having developers perform the ETL did not scale well, nor was it going to be cost effective.  We wanted to re-define ETL so that people who were, though still technical, not necessarily full on software developers.  At that point we began to focus on that as a core problem in addition to data integration.
 
 
+h2. Simplifying ETL
+
+We were able to hire technical personell who could learn a bit of scripting (bash or perl) and knew enough sql to work with data once it was in a relational database, and then extrat the data to our customer's requirements afterward.  What we needed then were simpler tools for making it easy to describe and subsequently work with the raw data (represented as flat files, ms access databases and other well structured formats), then modelling that data and mapping it into a form that could be used.
+
+For the former we developed a set of libraries and suite of tools we called the Abstract Table Utilities.  For the latter we used what we now understand to be a Semantic Mapping approach, using semantic tagging to describe the input data model and then an ontological mapping to describe how to map it into a form that the subsequent data integration could be performed on.
+
+h2. Abstract Tables
+
+The abtab (abstract-table) libraries centered around the idea of abstracting away the encoding of a table of data from its encoding, by defining a table as a stream of records where a record was a set of named fields.  The encoding shoudl be able to vary independentl of the structure of the table itself.
+
+Not long after we settled on that description, we came up with the idea of using a URI as an opaque representation of the table.  The schema would represent the encoding (which we called a 'driver' : tab delimited, csv, fixed width, mysql, mdb, and so on), the path would represent the location (file path, database host / database / schema), and the query string would allow for custom options for each driver (schema).
+
+We developed the libraries in Perl and in parallel we also developed command line utilities.  The command line utilites allowed the non-programmers to write scripts and makefiles that performed moderately complex ETL and data transformations by composing these tools together.
+
+An example is probably the most valuable way to get this idea across:
+
+<pre class="code">
+user@host ~$ abtab_cat -i mysql//localhost/pa_licensed_physicians | abtab_grep -e '$F[LICENSE_TYPE] eq "MD"' | abtab_cat -o csv://data/clients/med-dev-co1/pa-mds.csv
+</pre>
+
 h1. Aaron's ETL Outline
 
 * What is ETL
