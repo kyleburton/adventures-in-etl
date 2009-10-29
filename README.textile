@@ -48,8 +48,181 @@ We developed the libraries in Perl and in parallel we also developed command lin
 An example is probably the most valuable way to get this idea across:
 
 <pre class="code">
-user@host ~$ abtab_cat -i mysql//localhost/pa_licensed_physicians | abtab_grep -e '$F[LICENSE_TYPE] eq "MD"' | abtab_cat -o csv://data/clients/med-dev-co1/pa-mds.csv
+user@host ~$ abtab_cat -i mysql://localhost/pa_licensed_physicians | abtab_grep -e '$F[LICENSE_TYPE] eq "MD"' | abtab_cat -o csv://data/clients/med-dev-co1/pa-mds.csv
 </pre>
+
+This set of commands first selects the data out of a table in mysql, converting it to tab-delimited format (inclusive of the header), performing a filter operation on the LICENSE_TYPE field for values of 'MD', then finally emitting the result (including the header) into a file in comma separated value format.
+
+These utilities were originally implemented in Perl and used utf8 as their default character encoding.  This covered the vast majority of the file encodings that we saw.  In rare cases we would process data that was encoded in EBCDIC or another character set and in those rare instances we would use a separate format converter or a custom format adapter.
+
+
+h3. API and  and Commands
+
+h4. Driver.open_resource(uri)
+
+Static factory method.  Based on the set of registered drivers, construct, initialize and reutrn a driver instance for the given uri.  The driver class was determined via registration based on the URI schema.
+
+Note that after open_resource, the driver is neither in read, nor write mode.  The subsequent api calls that the user makes determined the read/write nature of the driver instance.  If one of the read methods were invoked (eg: read_next_record, get_headers, etc.) then the stream was opened and internal state was initalized.  If one of write methods were invoked (eg: set_headers, write_record), then the target encoding was destroyed (delted, truncated, etc) or otherwise opened in write mode.  Not all drivers supported writing, in which case they were expected to throw an exception to halt further processing.
+
+h4. Driver.import_header_constants([prefix])
+
+This used Perl's meta-programming to inject constants into the calling code, which were named identically to the column names in the table.  These constants mapped to the array indicies for the fields (to be used with read-next-record, as well as in constructing records).
+
+This allowed code to be both readable (using column names instead of hard-coded index values), efficient (array indexing was superior to map lookups), and resistant against the input file format changing - as the constants would trigger a hard error at runtime if they were not created during the import call.
+
+<pre class="code">
+  my $input = Abtab.get_resource($some_uri);
+  $input->import_header_constants('F_');
+  while( my $rec = $input->read_next_record ) {
+    printf "(Name,Id) = (%s,%s)\n", $rec->[F_NAME()], $rec->[F_ID()];
+  }
+  $input->close;
+</pre>
+
+In that example, if it were to open a source that did not have both a NAME and an ID column, the code would error on the first record.
+
+In the event that a field name was used more than one time, the implementation would emit a warning and then append an underscore and a numeric counter so that the constant would not conflict.  If there were 3 NAME fields in the previous example, then import would create 3 constants: NAME, NAME_1, an NAME_2.
+
+In practice, we observed poorly constructed files, and often had no control over having them be re-created to 'spec', this feature allowed those files to be analyzed and processed.
+
+h4. Driver.read_next_record => Array
+
+Returns the next record from the stream, or undef (equiv to nil / null) if the stream was exhausted.  Note that it did not automatically close or clean up the driver instance, the user had to do so manually.  Field order was preserved perfectly.
+
+h4. Driver.read_next_record_map => Map
+
+Returned the next record from the stream as a map.  Field names were a string, values were a string -- no type convesion was done by the library, that behavior was left up to calling code.
+
+h4. Driver.read_all_records => Array[Array]
+
+Drivers were free to implement this if greater efficiencies could be gained via a bulk read operation.
+
+h4. Driver.get_headers => Array
+
+Returned an array of the column names in declared order.
+
+h4. Driver.get_field_idx(field_name)
+
+Returned the integer index (0 baesd) for the requested field.
+
+h4. Driver.write_next_record(Array)
+
+Wrote a record to the stream.
+
+h4. Driver.write_next_record_map(Map)
+
+h4. Driver.write_records(Array[Array])
+
+Drivers were free to implement this if greater efficiencies could be gained via a bulk write operation.
+
+h4. Driver.reset
+
+This reset the internal state of the driver.  If it was used for reading, it could then be used again.  If it were used for writing, then this closed the write handle and re-set it for either re-writing or reading from the beginning of the stream.
+
+h4. Driver.set_headers
+
+This was a destructive operation to the uri target.  If called on a driver that was currently reading, it caused an exception (a reset would allow for this).  If called on a driver already writing then an exception was also thrown.
+
+If called on a newly initalized driver, the target would be truncated or deleted and re-created to fit the new structure.  In the case of sql based targets, they would create VARCHAR(255) fields, making a default assumption of text / string data.  Some of the drivers did support additional parameters on the URI (in the query string) or to their constructors and instances directly to specify types, but type specificaiton was not part of the base abstract table api since many drivers would be unable to support it and it was not necessary for the system to be useful.  We determined it wasn't worth the effort of implementation in the base classes.
+
+h3. Command Line Utilities / Applications
+
+All of these utilities followed the core unix philosophies of being composable via their standard input and standard output streams, emitting non-data errors to their error stream, as well as being permissive in what input they accepted and strict in the output they emitted.  Following these principals enabled the tools to be used and re-used in conjunction with a wider array of other tools - including the standard suite of unix utilities.
+
+<pre class="code">
+user@host ~$ abtab_cat -i 'xls://pa_licensed_physicians.xls?sheet=Sheet1&row=5&column=2&stop_pattern=Totals' | cut -f1 | sort | uniq -c | sort -nr
+</pre>
+
+This example extracts data from the first work sheet in an Excel file, starting at a specific offset and stopping when it sees teh text 'Totals' in the record.  The first column (presumably an identifier column) is taken, with all others discarded, the ids are sorted and then duplicates are counted and finally sorted numerically in reverse order.  The output produced from this ensemble is the list of duplicated IDs sorted by the amount of duplicaton.  If used on another column (say state or credentials), the same set of operations would produce a histogram of values - a common initial step when analyzing a file.
+
+h4. App.Cat
+
+This utility acted similarly to the standard Unix program cat.  In its basic form it took a URI and emitted a tab-delimited record stream to it's standard output.  It was able to take both an input and an output URI, and thus was easily useable to perform file format or encoding conversion.
+
+<pre class="code">
+user@host ~$ abtab_cat -i mysql://localhost/pa_licensed_physicians -o xls://pa-physicians.xls
+user@host ~$ abtab_cat -i mysql://localhost/pa_licensed_physicians -o tab:///dev/stdout | cut -f 2- > physicians-no-ids.tab
+user@host ~$ abtab_cat -i mysql://localhost/pa_licensed_physicians -o 'tab:///dev/stdout?delim=,&record_separator=%0D%0A'
+</pre>
+
+In the first example a mysql table is converted into an Excel spreadsheet.  The second example emits tab-delimited output, passing it through the unix cut utility to strip off the first column (presumably an ID column) and the redirects the (still) tab-delimited output to capture it into a local file.  The last example emits the same data, utilizing driver specific parameters to change the field delimiter and the record separator.
+
+On Unix, the use of the '/dev/stdin' and '/dev/stdout' special files allowed several of the utilities to have simpler arugment processing (eg: require the input or output files to be spcified) while still allowing them to be composed with each other and other commands in a pipeline.
+
+h4. App.Grep
+
+This mirroed the functionality of the unix grep utility.  This utility preserved the header line, supported full perl regular expressions as well as perl expressions.  As with the behavior of perl's '-a' (awk-mode) switch, the record was stored in the array '@F' for use by the expression.
+
+<pre class="code">
+user@host ~$ abtab_cat -i mysql://localhost/pa_licensed_physicians | abtab_grep -e '$F[LICENSE_TYPE] eq "MD"' | abtab_cat -o csv://data/clients/med-dev-co1/pa-mds.csv
+</pre>
+
+As this exampel shows, the constants mentioned in the drivers section were made available to the code being executed, which made expression based searching more readable.
+
+h4. App.View
+
+View was an interactive appilcation that allowed the records to be seen in a vertially displayed manner, rather than just as a table.
+
+<pre class="code">
+tab://pa_licensed_physicians.tab [       1]
+[  0]                    ID: 134166134
+[  1]                 FNAME: John
+[  2]                 LNAME: Smith
+[  3]                  CRED: MD
+[  4]               STREET1: 123 E. Main St.
+...
+</pre>
+
+The utility supported an interactive mode where keys similar to Vim's navigation keys could be used to navigate the record stream (including going backward).
+
+h4. App.Mod
+
+h4. App.Analyze
+
+h4. App.Diff
+
+h4. Filter.Grepping
+
+h4. Filter.Sorting
+
+h4. Filter.Cutting
+
+h4. Filter.Normalizaing
+
+h4. Filter.Landscaping
+
+h4. Filter.Modifying
+
+h4. Filter.Teeing
+
+h4. Filter.Putback
+
+Developed for use by abtab_view, this allowed records to be placed back into the stream (which were just stored in-memory) to be (re)read again.
+
+h3. Drivers We Suported
+
+h4. Tab
+
+h4. CSV
+
+h4. Fixed Width
+
+h4. mysql
+
+h4. mdb (MS Access database)
+
+h4. oracle
+
+h4. DBI (equivalent to JDBC or ODBC)
+
+h3. Array
+
+This was an in-memory driver
+
+h4. Driver.import(uri), Driver.import(Driver)
+
+Used to do bulk operations when they were more efficient - in the case of Mysql, where a file based URI was provided where mysql could handle the format, this would make use of mysql's "copy infile" command to quickly import the data (typically 10-100x faster than a series of insert statements).
+
 
 h1. Aaron's ETL Outline
 
