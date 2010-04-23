@@ -1,49 +1,72 @@
-h1. Adventures in Data - Looking up from the Mezzanine of Data Warehousing
+h1. Overview
 
-If you've worked with relational databases at all, you've likely had to export data from them, and import data into them.  We do this to back dat up, to migrate data sets from one version of our application to another, for replication, and as part of the normal operation of our systems.  You are surrounded by ETL.
+I've started a second narrative, jump to "No. 12 at a Data Integration Company" for the 2nd, jump to "Adventures in Data - Looking up from the Mezzanine of Data Warehousing" for the first attempted narrative.
 
-I was personally thrown deep into the world of ETL during my time at a Philladelphia area staart up who's core focus was data integration.  At that company had to deal with, what was at the time, a vast amount of ETL.  Being a start up, we couldn't afford commercial tools and embarked on creating our own.
+h1. "No. 12 at a Data Integration Company"
 
-This talk is about my experiences developing those tools and how we used them to process data en masse.  I'll discuss how I feel we diverged from the standard model of ETL and what we feel the trade offs were.
+
+This is the start of a second narrative.  Talking to Aaron, the suggestion was to just detail what we dealt with, where the sources came from, how large they were, how frequent.  Not talk about the tools or techniques right away.
+
+h2. Selling Pharmaceuticals
+
+The founder had worked as as Pharmaceutical sales representative.  His job was to inform medical practitioners of the efficacy of his company's products.  In a very real sense, a Pharmaceutical sales rep's core role is to teach health-care practitioners about new drugs, their characteristics and the FDA approved applications of a drug.  That's how the sales are often driven.  Doctors often don't have a lot of free time, and having an in-depth discussion about a new drug with a doctor can end up taking a lot of time.
+
+
+The sale's rep's first task was to even identify who the medical practitioners are and how to contact them.
+
+As we all do, a sales rep will want to optimize the use of their time, which leads to trying to identify the subset of practitioners that are even appropriate to make contact with.  It makes no sense to engage a pediatrician with information about newly approved alzheimers treatments.
+
+Mark went out and looked for good data sets that he could use to do this kind of qualification, bought one and wasn't very happy with it.  It had poor coverage (he knew lots of doctors that were missing from the data set), it was incomplete (there was incompltely filled in data, missing specialty information, credentials, licensure information), and it was inaccurate.
+
+
+<!-- -------------------------------------------------------------------------------- -->
+
+h1. "Adventures in Data - Looking up from the Mezzanine of Data Warehousing"
+
+If you've worked with relational databases at all, you've likely had to export data from them, and import data into them.  We do this to back data up, to migrate data sets from one version of our application to another, for replication, and as part of the normal operation of our systems.  You are surrounded by ETL.
+
+I was personally thrown deep into the world of ETL during my time at a Philadelphia area start up who's core focus was data integration.  At that company had to deal with, what was at the time, a vast amount of ETL.  Being a start up, we couldn't afford commercial tools and embarked on creating our own.
+
+This talk is about my experiences developing those tools and how we used them to process data en mass.  I'll discuss how I feel we diverged from the standard model of ETL and what we feel the trade offs were.
 
 h1. What is ETL?
 
 {{{ need more references : wikipedia has a good overview of ETL }}}
 
-ETL is an acronym for: Extract, Transform and Load.  It is a blanket term for the tools, processes, and techniques used to export data from one system, cleanse and reformat it, and finally import it into a target sysetm.
+ETL is an acronym for: Extract, Transform and Load.  It is a blanket term for the tools, processes, and techniques used to export data from one system, cleanse and reformat it, and finally import it into a target system.
 
 h1. The Problem: Circa 1999
 
-The initial core product of the data integration company was a national (US) master file of demographic data on healthcare practitioners.  The founder's idea was that you could builtd a more comprehensive, accurate master data set by combining as many independent sources of data as possible - each one providing more attirbutes, or more of a confirmation of the data values from the other sources.  The more sources agreed that a particular attriubte was correct (eg: first name), the higher the probability that the value was actually correct.
+The initial core product of the data integration company was a national (US) master file of demographic data on health-care practitioners.  The founder's idea was that you could build a more comprehensive, accurate master data set by combining as many independent sources of data as possible - each one providing more attributes, or more of a confirmation of the data values from the other sources.  The more sources agreed that a particular attribute was correct (eg: first name), the higher the probability that the value was actually correct.
 
 He had created the first data sets out of a handful of data bases that he had purchased and integrated together using a combination of table joins in Microsoft Access augmented by cleansing and parsing he did by hand with a mouse and cut&paste.  It was humbling to see how quickly he could manipulate data by hand with MS Access.
 
-After having good success creating an initial data set by hand, and realizing that he could acheive significantly better results by acquirning and integrating vastly larger data sets, he founded the data integration company with the express purpose of developing software to perform the data ingtegration.
+After having good success creating an initial data set by hand, and realizing that he could achieve significantly better results by acquiring and integrating vastly larger data sets, he founded the data integration company with the express purpose of developing software to perform the data integration.
 
-Data sets had to be purchased, and employees be hired - this left little capital early on for buying commercial ETL and data integration tools, which were prohibitivly expensive for us as a start up (hundreds of thousands to millions of dollars).
+Data sets had to be purchased, and employees be hired - this left little capital early on for buying commercial ETL and data integration tools, which were prohibitively expensive for us as a start up (hundreds of thousands to millions of dollars).
 
 h2. Data Sources
 
 Not all of the software was developed at once.  At about the five year mark, we had managed to create a system that integrated several thousand databases, representing several hundred relational data models.
 
-We had initially started with what we saw as the traditionall ETL approaches: have developers create 'sql loader' import configurations (we tried Oracle, SQL Server, and MySQL's tools); have developers create custom perl or VB import programs; or have an analyst try to create import processes using MS Access.  What we found was that we had very little influence over the data providers and the format they would send to us; many of the data providers we were receiving data from changed their formats much more frequently than we had anticipated (leading to high maintenence on the customized ETL processes); we were continually improving our understanding of the data we were creating and this was feeding back into how we were doing ETL on the data we were receiving - we realized that as we better understood the data, that we could improve our master-file's comprehensiveness and accuracy by improving how we cleansed and mapped the input sources.
+We had initially started with what we saw as the traditional ETL approaches: have developers create 'sql loader' import configurations (we tried Oracle, SQL Server, and MySQL's tools); have developers create custom perl or VB import programs; or have an analyst try to create import processes using MS Access.  What we found was that we had very little influence over the data providers and the format they would send to us; many of the data providers we were receiving data from changed their formats much more frequently than we had anticipated (leading to high maintenance on the customized ETL processes); we were continually improving our understanding of the data we were creating and this was feeding back into how we were doing ETL on the data we were receiving - we realized that as we better understood the data, that we could improve our master-file's comprehensiveness and accuracy by improving how we cleansed and mapped the input sources.
 
 As we started in that first year, the realization dawned on us that having developers perform the ETL did not scale well, nor was it going to be cost effective.  We wanted to re-define ETL so that people who were, though still technical, not necessarily full on software developers.  At that point we began to focus on that as a core problem in addition to data integration.
 
 
 h2. Simplifying ETL
 
-We were able to hire technical personell who could learn a bit of scripting (bash or perl) and knew enough sql to work with data once it was in a relational database, and then extrat the data to our customer's requirements afterward.  What we needed then were simpler tools for making it easy to describe and subsequently work with the raw data (represented as flat files, ms access databases and other well structured formats), then modelling that data and mapping it into a form that could be used.
+We were able to hire technical personnel who could learn a bit of scripting (bash or perl) and knew enough sql to work with data once it was in a relational database, and then extract the data to our customer's requirements afterward.  What we needed then were simpler tools for making it easy to describe and subsequently work with the raw data (represented as flat files, ms access databases and other well structured formats), then modeling that data and mapping it into a form that could be used.
 
 For the former we developed a set of libraries and suite of tools we called the Abstract Table Utilities.  For the latter we used what we now understand to be a Semantic Mapping approach, using semantic tagging to describe the input data model and then an ontological mapping to describe how to map it into a form that the subsequent data integration could be performed on.
 
 h2. Abstract Tables
 
-The abtab (abstract-table) libraries centered around the idea of abstracting away the encoding of a table of data from its encoding, by defining a table as a stream of records where a record was a set of named fields.  The encoding shoudl be able to vary independentl of the structure of the table itself.
+The abtab (abstract-table) libraries centered around the idea of abstracting away the encoding of a table of data from its encoding, by defining a table as a stream of records where a record was a set of named fields.  The encoding should be able to vary independently of the structure of the table itself.
 
 Not long after we settled on that description, we came up with the idea of using a URI as an opaque representation of the table.  The schema would represent the encoding (which we called a 'driver' : tab delimited, csv, fixed width, mysql, mdb, and so on), the path would represent the location (file path, database host / database / schema), and the query string would allow for custom options for each driver (schema).
 
-We developed the libraries in Perl and in parallel we also developed command line utilities.  The command line utilites allowed the non-programmers to write scripts and makefiles that performed moderately complex ETL and data transformations by composing these tools together.
+We developed the libraries in Perl and in parallel we also developed command line utilities.  The command line utilities allowed the non-programmers to write scripts and make-files that performed moderately complex ETL and data transformations by composing these tools together.
 
 An example is probably the most valuable way to get this idea across:
 
@@ -60,15 +83,15 @@ h3. API and  and Commands
 
 h4. Driver.open_resource(uri)
 
-Static factory method.  Based on the set of registered drivers, construct, initialize and reutrn a driver instance for the given uri.  The driver class was determined via registration based on the URI schema.
+Static factory method.  Based on the set of registered drivers, construct, initialize and return a driver instance for the given uri.  The driver class was determined via registration based on the URI schema.
 
-Note that after open_resource, the driver is neither in read, nor write mode.  The subsequent api calls that the user makes determined the read/write nature of the driver instance.  If one of the read methods were invoked (eg: read_next_record, get_headers, etc.) then the stream was opened and internal state was initalized.  If one of write methods were invoked (eg: set_headers, write_record), then the target encoding was destroyed (delted, truncated, etc) or otherwise opened in write mode.  Not all drivers supported writing, in which case they were expected to throw an exception to halt further processing.
+Note that after open_resource, the driver is neither in read, nor write mode.  The subsequent api calls that the user makes determined the read/write nature of the driver instance.  If one of the read methods were invoked (eg: read_next_record, get_headers, etc.) then the stream was opened and internal state was initialized.  If one of write methods were invoked (eg: set_headers, write_record), then the target encoding was destroyed (deleted, truncated, etc) or otherwise opened in write mode.  Not all drivers supported writing, in which case they were expected to throw an exception to halt further processing.
 
 h4. Driver.import_header_constants([prefix])
 
-This used Perl's meta-programming to inject constants into the calling code, which were named identically to the column names in the table.  These constants mapped to the array indicies for the fields (to be used with read-next-record, as well as in constructing records).
+This used Perl's meta-programming to inject constants into the calling code, which were named identically to the column names in the table.  These constants mapped to the array indexes for the fields (to be used with read-next-record, as well as in constructing records).
 
-This allowed code to be both readable (using column names instead of hard-coded index values), efficient (array indexing was superior to map lookups), and resistant against the input file format changing - as the constants would trigger a hard error at runtime if they were not created during the import call.
+This allowed code to be both readable (using column names instead of hard-coded index values), efficient (array indexing was superior to map look-ups), and resistant against the input file format changing - as the constants would trigger a hard error at run-time if they were not created during the import call.
 
 <pre class="code">
   my $input = Abtab.get_resource($some_uri);
@@ -91,7 +114,7 @@ Returns the next record from the stream, or undef (equiv to nil / null) if the s
 
 h4. Driver.read_next_record_map => Map
 
-Returned the next record from the stream as a map.  Field names were a string, values were a string -- no type convesion was done by the library, that behavior was left up to calling code.
+Returned the next record from the stream as a map.  Field names were a string, values were a string -- no type conversion was done by the library, that behavior was left up to calling code.
 
 h4. Driver.read_all_records => Array[Array]
 
@@ -103,7 +126,7 @@ Returned an array of the column names in declared order.
 
 h4. Driver.get_field_idx(field_name)
 
-Returned the integer index (0 baesd) for the requested field.
+Returned the integer index (0 based) for the requested field.
 
 h4. Driver.write_next_record(Array)
 
@@ -123,7 +146,7 @@ h4. Driver.set_headers
 
 This was a destructive operation to the uri target.  If called on a driver that was currently reading, it caused an exception (a reset would allow for this).  If called on a driver already writing then an exception was also thrown.
 
-If called on a newly initalized driver, the target would be truncated or deleted and re-created to fit the new structure.  In the case of sql based targets, they would create VARCHAR(255) fields, making a default assumption of text / string data.  Some of the drivers did support additional parameters on the URI (in the query string) or to their constructors and instances directly to specify types, but type specificaiton was not part of the base abstract table api since many drivers would be unable to support it and it was not necessary for the system to be useful.  We determined it wasn't worth the effort of implementation in the base classes.
+If called on a newly initialized driver, the target would be truncated or deleted and re-created to fit the new structure.  In the case of sql based targets, they would create VARCHAR(255) fields, making a default assumption of text / string data.  Some of the drivers did support additional parameters on the URI (in the query string) or to their constructors and instances directly to specify types, but type specification was not part of the base abstract table api since many drivers would be unable to support it and it was not necessary for the system to be useful.  We determined it wasn't worth the effort of implementation in the base classes.
 
 h3. Command Line Utilities / Applications
 
@@ -133,11 +156,11 @@ All of these utilities followed the core unix philosophies of being composable v
 user@host ~$ abtab_cat -i 'xls://pa_licensed_physicians.xls?sheet=Sheet1&row=5&column=2&stop_pattern=Totals' | cut -f1 | sort | uniq -c | sort -nr
 </pre>
 
-This example extracts data from the first work sheet in an Excel file, starting at a specific offset and stopping when it sees teh text 'Totals' in the record.  The first column (presumably an identifier column) is taken, with all others discarded, the ids are sorted and then duplicates are counted and finally sorted numerically in reverse order.  The output produced from this ensemble is the list of duplicated IDs sorted by the amount of duplicaton.  If used on another column (say state or credentials), the same set of operations would produce a histogram of values - a common initial step when analyzing a file.
+This example extracts data from the first work sheet in an Excel file, starting at a specific offset and stopping when it sees the text 'Totals' in the record.  The first column (presumably an identifier column) is taken, with all others discarded, the ids are sorted and then duplicates are counted and finally sorted numerically in reverse order.  The output produced from this ensemble is the list of duplicated IDs sorted by the amount of duplication.  If used on another column (say state or credentials), the same set of operations would produce a histogram of values - a common initial step when analyzing a file.
 
 h4. App.Cat
 
-This utility acted similarly to the standard Unix program cat.  In its basic form it took a URI and emitted a tab-delimited record stream to it's standard output.  It was able to take both an input and an output URI, and thus was easily useable to perform file format or encoding conversion.
+This utility acted similarly to the standard Unix program cat.  In its basic form it took a URI and emitted a tab-delimited record stream to it's standard output.  It was able to take both an input and an output URI, and thus was easily usable to perform file format or encoding conversion.
 
 <pre class="code">
 user@host ~$ abtab_cat -i mysql://localhost/pa_licensed_physicians -o xls://pa-physicians.xls
@@ -147,21 +170,21 @@ user@host ~$ abtab_cat -i mysql://localhost/pa_licensed_physicians -o 'tab:///de
 
 In the first example a mysql table is converted into an Excel spreadsheet.  The second example emits tab-delimited output, passing it through the unix cut utility to strip off the first column (presumably an ID column) and the redirects the (still) tab-delimited output to capture it into a local file.  The last example emits the same data, utilizing driver specific parameters to change the field delimiter and the record separator.
 
-On Unix, the use of the '/dev/stdin' and '/dev/stdout' special files allowed several of the utilities to have simpler arugment processing (eg: require the input or output files to be spcified) while still allowing them to be composed with each other and other commands in a pipeline.
+On Unix, the use of the '/dev/stdin' and '/dev/stdout' special files allowed several of the utilities to have simpler argument processing (eg: require the input or output files to be specified) while still allowing them to be composed with each other and other commands in a pipeline.
 
 h4. App.Grep
 
-This mirroed the functionality of the unix grep utility.  This utility preserved the header line, supported full perl regular expressions as well as perl expressions.  As with the behavior of perl's '-a' (awk-mode) switch, the record was stored in the array '@F' for use by the expression.
+This mirrored the functionality of the unix grep utility.  This utility preserved the header line, supported full perl regular expressions as well as perl expressions.  As with the behavior of perl's '-a' (awk-mode) switch, the record was stored in the array '@F' for use by the expression.
 
 <pre class="code">
 user@host ~$ abtab_cat -i mysql://localhost/pa_licensed_physicians | abtab_grep -e '$F[LICENSE_TYPE] eq "MD"' | abtab_cat -o csv://data/clients/med-dev-co1/pa-mds.csv
 </pre>
 
-As this exampel shows, the constants mentioned in the drivers section were made available to the code being executed, which made expression based searching more readable.
+As this example shows, the constants mentioned in the drivers section were made available to the code being executed, which made expression based searching more readable.
 
 h4. App.View
 
-View was an interactive appilcation that allowed the records to be seen in a vertially displayed manner, rather than just as a table.
+View was an interactive application that allowed the records to be seen in a vertically displayed manner, rather than just as a table.
 
 <pre class="code">
 tab://pa_licensed_physicians.tab [       1]
@@ -177,31 +200,116 @@ The utility supported an interactive mode where keys similar to Vim's navigation
 
 h4. App.Mod
 
+Mod supported the addition, removal or computation of new columns.  It allowed columns to be appended on the right hand side or left hand side of a record with constant values or via an expression.  This made it possible to add time or date stamps, an auto-increment column, or composite key construction from other fields when data sources lacked these types of attributes that users wanted to utilize.
+
 h4. App.Analyze
+
+Analyze performed a series of simple analytics, uniqueness counts, fill rates, histograms and so on.  This was intended as a first pass analysis of a file to help get a feel for the data that it contained and superficially the value or quality of the file (eg: based on a columns fill rate).
 
 h4. App.Diff
 
+The diffing application operated in several modes and supported a very complex DSL for configuration of the analysis process.  It supported differencing to table sources to find added, removed or changed records - which could be identified by key columns, including or ignoring specific columns, etc.  Using the fuller configuration DSL, it supported differencing joined tables, where a primary table was specified, it would analyze child and foreign key related records between two database snapshots.
+
+It produced both reports as well as delta outputs of the analyzed data sets.  This was used in situations where we were delivering updates to data periodically to our customers - we would difference the last deliverable against the current one and only send over the changes.  This tool simplified the receipt and handling of the updates by our customers, as it would emit an entity in its entirety if there was any change to any part of the entity across the data model.   This allowed our customers to do a cascading delete and then a series of inserts to handle the update - and not have to implement more complex updating processes.
+
 h4. Filter.Grepping
+
+This was the internal implementation of the bulk of the grepping filter.  It took the search string, or pattern, or expression from constructor parameters.  For simple string and pattern searches, it looked for an infix match within all the fields.  For expression searches it executed the expression, taking the result as a boolean indicator.
 
 h4. Filter.Sorting
 
+This is the first of the drivers that could not be implemented simply as a stream.  Keys were specified as one or more field names (or indexes) into the constructor.  The actual behavior of the driver was to stream the source in its entirety to a temporary file, pre-pending a composite key column onto the front of each record.  This file was written in tab-delimited encoding so that it would be easier to post-process.  If it was executed on a posix platform, it then executed the GNU sort utility to sort the temporary file, if not on a posix platform it performed a simplistic indexing operation on that first column and record start and end positions, loaded this index into memory and then used a random access methodology to stream the records back to the reader.  In all cases the file was created as a temporary file that would be cleaned up automatically at process exit time, though the utility did make efforts to remove the file when the driver was closed off.
+
+I've detail the implementation strategies here so that I can discuss some of the challenges and trade offs we made in this particular case.  We frequently dealt with files that were larger than available ram, and very frequently larger than would fit in a 32bit process space (~2Gb).  The gnu sort utility has been refined over many years and is surprisingly I/O, memory and cpu efficient when dealing with these kinds of large files.  Rather than expend resources attempting (futility I suspect) to outdo the performance the sort utility already exhibited we made the decision to use it when present.  The major issue we encountered with this approach was that when we ported the libraries to Solaris that the command line parameters to sort were different, otherwise we found to utility to be robust and performant.
+
+In the cases where we were on non-posix (gnu) platforms, the indexing approach was used as a fall back.  It was not as performant as using sort.  The text indexer was something we had written for use in other parts of our application and was reused in the sorting filter.
+
+h4. Filter.Grouping
+
+This is another of the filters that could not be simply a stream.  It in fact re-used the sorting filter, passing on the grouping key(s), as well as re-using the Push-back filter.  It simply read from the sorted stream until the key had changed, put the record with the new key back and then returned the group from the read_next_group method.
+
+h4. Filter.Join
+
+This is exactly what it sounds like, a database join.  It supported composite keys, though it did not support arbitrary expressions (technicians could use the other modifying filters to perform the transformations to create a suitable join key), as well as inner and outer joins.  I do not recall using this filter frequently myself, and can not recall if we relied on the command line join utility or if we just implemented it as a merge of multiple sorting filters.
+
 h4. Filter.Cutting
 
-h4. Filter.Normalizaing
+This was the equivalent of selecting only specified fields from a table.  It supported explicit listing of fields (a,b,c), and ranges (2-5 : two through five, 2- : two through the last column, -9 : first to the ninth column).  In those examples I've used integer indexes, though the driver supported using the column names and using names was best practice with the libraries.
+
+h4. Filter.Normalizing
+
+This filter would take a set of equivalent fields and return them normalized out of a single record.
+
+<pre class="code">
+  $inp = Filter.Cutting.new($base_uri,
+    [qw(Street1 Street2 City State Zip)],
+    [qw(Street1_1 Street1_2 City1 State1 Zip1)],
+    [qw(Street2_1 Street2_2 City2 State2 Zip2)]
+  )
+</pre>
+
+The above configuration would unroll the following file:
+
+<pre class="code">
+tab://pa_licensed_physicians.tab [       1]
+[  0]                        ID: 134166134
+[  1]                 Street1_1: 123 Main St
+[  2]                 Street1_2:
+[  3]                     City1: Philadelphia
+[  4]                    State1: PA
+[  5]                      Zip1: 19101
+[  6]                 Street1_1: 928 North State Street
+[  7]                 Street1_2:
+[  8]                     City1: Bristol
+[  9]                    State1: PA
+[ 10]                      Zip1:
+...
+</pre>
+
+Into 1 line per address:
+
+<pre class="code">
+tab://pa_licensed_physicians.tab [       1]
+[  0]                        ID: 134166134
+[  1]                   Street1: 123 Main St
+[  2]                   Street2:
+[  3]                      City: Philadelphia
+[  4]                     State: PA
+[  5]                       Zip: 19101
+tab://pa_licensed_physicians.tab [       2]
+[  0]                        ID: 134166134
+[  1]                   Street1: 928 North State Street
+[  2]                   Street2:
+[  3]                      City: Bristol
+[  4]                     State: PA
+[  5]                       Zip:
+...
+</pre>
+
 
 h4. Filter.Landscaping
 
+The landscaping filter did the opposite of the Normalizing filter.  It was given sets of duplicated column names and would fill in the additional sets of columns until it ran out of records, or if there were more records than would fit, the remainder were discarded and a warning was produced.
+
 h4. Filter.Modifying
+
+The modifying filter was created to support a simplified command line application for performing common tasks like adding an additional column with an empty or fixed value (eg: a constant, a time-stamp such as an extract or delivery date, etc).
 
 h4. Filter.Teeing
 
-h4. Filter.Putback
+h4. Filter.Pushback
 
-Developed for use by abtab_view, this allowed records to be placed back into the stream (which were just stored in-memory) to be (re)read again.
+Developed for use by abtab_view, this allowed records to be placed back into the stream (which were just stored in-memory) to be (re)read again.  The filter implementation did not require that records be put back in any order or that the records were put back were originally pulled from the stream, though abtab_view did do this.
 
-h3. Drivers We Suported
+h3. The Drivers we Implemented
+
+The majority of the file drivers supported gzip compression for reading and writing of the underlying file data.
 
 h4. Tab
+
+This was a simple delimited format, with support for specifying the field or record delimiters only.  In the case the field or record delimiters occurred in the data, they were back-slashed on output, but not 'unbackslashed' on input.  This was a consistency trade-off that worked out well in practice because it simplified the behavior of much of the rest of the code and provided good performance.
+
+This driver was the most commonly used as it was the default transport format used between utilities and produced the lightest weight (smallest) output files.
 
 h4. CSV
 
@@ -215,6 +323,10 @@ h4. oracle
 
 h4. DBI (equivalent to JDBC or ODBC)
 
+h4. Sh
+
+This would execute a shell command and parse its output as tab-delimited data.
+
 h3. Array
 
 This was an in-memory driver
@@ -227,15 +339,15 @@ Used to do bulk operations when they were more efficient - in the case of Mysql,
 h1. Aaron's ETL Outline
 
 * What is ETL
-  ETL (Extract, Transform, Load) is the blanket term for the tools and processes used to export data from one system and import them into antoher.  This typicall manifests itself as a dump of the source system's data base, a process to make the data model and values compatible with a target system and an import process to get the data into the target system.
+  ETL (Extract, Transform, Load) is the blanket term for the tools and processes used to export data from one system and import them into another.  This typically manifests itself as a dump of the source system's data base, a process to make the data model and values compatible with a target system and an import process to get the data into the target system.
 
-  There are challgenges in data model incongruencies, the formatting of values, the proper identification of data and types, the accuracy and consisteny of the export from the source system, and more. {{{ what else? }}}
+  There are challenges in data model incongruities, the formatting of values, the proper identification of data and types, the accuracy and consistency of the export from the source system, and more. {{{ what else? }}}
 
-    Relational databases often require closely tracked foreign Key {re}construction during the import process.  This leads to multi-step ETL processes where the initial data is bulk imported, then primary entites enumerated, then multiple rounds of join / updates are performed to propigate the primary keys.  Once all the data has been staged and stitched together in this way, then the final table imports are performed -- or constraints are re-enabled and indexes rebuilt.
+    Relational databases often require closely tracked foreign Key {re}construction during the import process.  This leads to multi-step ETL processes where the initial data is bulk imported, then primary entities enumerated, then multiple rounds of join / updates are performed to propagate the primary keys.  Once all the data has been staged and stitched together in this way, then the final table imports are performed -- or constraints are re-enabled and indexes rebuilt.
 
     We found that that traditional methodology lead to a high degree of analysis before hand (to ensure we understood the data, how to model it and how to transform it), a complex to build and complex to maintain ETL process (especially in the face of input sources that would change format over time, and a high volume of different data sets).
 
-    We found that traditional ETL approaches and processing lead us into expending a lot of effort on each ETL mapping, opaque processes that did not provide good feedback about progress, brittle processes that did not tolerate data inconsistencies well (often enough to handle a handful of errors, either an entire process needed to be restarted from early on, or the correction of that handful had to be done as a one-off that was not able to effectively be made into a formalized part of the ETL processing - often leading to manual process being instutionalized into the ETL processing).
+    We found that traditional ETL approaches and processing lead us into expending a lot of effort on each ETL mapping, opaque processes that did not provide good feedback about progress, brittle processes that did not tolerate data inconsistencies well (often enough to handle a handful of errors, either an entire process needed to be restarted from early on, or the correction of that handful had to be done as a one-off that was not able to effectively be made into a formalized part of the ETL processing - often leading to manual process being institutionalized into the ETL processing).
 
     {{{ Need to expand on this more }}} The way we did consolidation was also something that fed into our choices here.
 
@@ -246,7 +358,7 @@ h1. Aaron's ETL Outline
 
   We were building a master file of health care practitioner demographic data.  The philosophy was to create this out of as many independent sources of information we could obtain.Some sources covered different specialties, some covered different attributes, some were more timely, some were more accurate.  By consolidating all of these sources, and tracking quality metrics on all the attributes, the goal was to create a single view of the truth represented by all of those data sources.
 
- Multiple Dimensions: attributes (horizontal), coverage / comprehensiveness, accuracy of data alues (independent observation, and contrasting sources against each toher - determining derivation relationships), time (repeated observation and trending).
+ Multiple Dimensions: attributes (horizontal), coverage / comprehensiveness, accuracy of data values (independent observation, and contrasting sources against each other - determining derivation relationships), time (repeated observation and trending).
 
 ** data volume
 ** data source type
@@ -259,7 +371,7 @@ h1. Aaron's ETL Outline
 ** how long did it take to develop the initial version of the tool(s)
 ** who were the end users of the tool(s)
 * Exploratory ETL process via configuration
-** ability to configure during runtime
+** ability to configure during run-time
 ** visually inspect data while it is being processed
 * Abstract Table Tools
 ** How do they work
@@ -287,29 +399,29 @@ Extract, Transform, Load
 
 The goal is to take a data set from one system and load it into another system where there are likely to be significant differences in how the two systems store, model and otherwise represent their data.
 
-Extract data from a system (be they text files, a database dump, or other propreitary format), transform them into a form which can be understood (loaded) into the target system (change the encoding, data types, standardize values, morph the data model).
+Extract data from a system (be they text files, a database dump, or other proprietary format), transform them into a form which can be understood (loaded) into the target system (change the encoding, data types, standardize values, morph the data model).
 
-Most of this talk is going to focus on the movement of relationaly modeled data, tables of records with foreign key relationships, though ETL does not necessarily imply relationally modeled data.  Many of the tools that will be discussed were designed specifically to deal with this type of data.
+Most of this talk is going to focus on the movement of relationally modeled data, tables of records with foreign key relationships, though ETL does not necessarily imply relationally modeled data.  Many of the tools that will be discussed were designed specifically to deal with this type of data.
 
 h2. My own Experience with Data Integration
 
-My programming career started at a 401k benefits managment company, my job was to take a flat-file export from a Unisys main-frame and load it into an Integrated Voice Response system where customers could use a phone to check their balances and change their allocations.
+My programming career started at a 401k benefits management company, my job was to take a flat-file export from a Unisys main-frame and load it into an Integrated Voice Response system where customers could use a phone to check their balances and change their allocations.
 
 Little did I know at the time of what was to come...
 
-More recently I worked for a company that did larger scale data integration.  At that company we were integrating thousands of independent data sources into a single consolidated master file of data.  These were acquired in a wide variety of ways: assets purchased from companies that had gone out of business, public domain sources, government agencies, other data providers and even our own customers in reciprocial agreements.
+More recently I worked for a company that did larger scale data integration.  At that company we were integrating thousands of independent data sources into a single consolidated master file of data.  These were acquired in a wide variety of ways: assets purchased from companies that had gone out of business, public domain sources, government agencies, other data providers and even our own customers in reciprocal agreements.
 
-In nearly all cases we had very little influence on how we received the data, most often the sending party did not have the resources or expertise, or we did not wish to pay the preimium, to have them adapt their export processes to our input format or data model.
+In nearly all cases we had very little influence on how we received the data, most often the sending party did not have the resources or expertise, or we did not wish to pay the premium, to have them adapt their export processes to our input format or data model.
 
 Early on we didn't have a data model anyway.
 
-We needed to load tens to hundreds of sources a day, where a source was a snapshot of an input database.  Some of these were to be incorporeated into the master file, some were customer data integration jobs - to enhance their data and produce a deliverable back.
+We needed to load tens to hundreds of sources a day, where a source was a snapshot of an input database.  Some of these were to be incorporated into the master file, some were customer data integration jobs - to enhance their data and produce a deliverable back.
 
 We were a start-up and could not afford to purchase expensive ETL software, nor could we afford to staff up a large number of highly skilled (and expensive) database developers to perform the data transformation and loading process.
 
-What we ended up doing was thinking a bit differently about the different facets of ETL and creating tools that allowed us to leverage technical anlysts to perform the ETL mapping, without requiring programming skills, or significant amounts of training.
+What we ended up doing was thinking a bit differently about the different facets of ETL and creating tools that allowed us to leverage technical analysts to perform the ETL mapping, without requiring programming skills, or significant amounts of training.
 
-We even saw a not insignificant amount of data errors or corruption - we had optical media from defunct companies that had bit level errors.  The data was valueable enought that we worked to correct and accomodate those kinds of errors in our system.
+We even saw a not insignificant amount of data errors or corruption - we had optical media from defunct companies that had bit level errors.  The data was valuable enough that we worked to correct and accommodate those kinds of errors in our system.
 
 h3. Data Volumes
 
@@ -327,7 +439,7 @@ h3. Data Formats
 **** Mis-fielded Data
 **** 'Somewhat fixed' - data overrunning into adjacent fields
 *** Delimited
-**** Name for the 'well formed delimted' like tab/pipe?
+**** Name for the 'well formed delimited' like tab/pipe?
 **** Name for the 'complex delimited' like CSV?
 ** SemiStructured
 *** PDF Files
@@ -338,20 +450,20 @@ h2. Start with the lowest level, move up one conceptual level at a time.
 
 * Files: Blobs of Binary Data Sitting on Disk
 * Records: Delimited or Fixed Width
-* Feilds: Simple Delimited, Complex Delimited, Fixedwidth
+* Fields: Simple Delimited, Complex Delimited, Fixed-width
 * Model: types, validation and meaning from a text dump
 
 
 * Files: Blobs of Binary Data Sitting on Disk
 ** Encoding: Streams of Characters
-  By far the most common format I had to deal with was basic ascii represented as 8-bit characters, which
+  By far the most common format I had to deal with was basic ASCII represented as 8-bit characters, which
   is in fact, equivalent to Latin-X.  The next most common was Latin-15 (ISO-8859-15), allowing for other
   common western language's extended character sets.
 *** ASCII
 *** utf-8
 *** Latin-X
 *** EBCDIC
-** First recognition of structure: lines or records (record delmiter / fixed record size)
+** First recognition of structure: lines or records (record delimiter / fixed record size)
 *** record delimiters are not consistent
 *** record delimiters are embedded in the data
 *** sometimes there are _no_ record separators
@@ -366,12 +478,12 @@ h2. Start with the lowest level, move up one conceptual level at a time.
 **** but file is a de-normalized dump of primary source
 **** key no longer unique
 **** complicates your import
-**** simple analyiss tricks for determining the uniqueness of a key column
+**** simple analysis tricks for determining the uniqueness of a key column
 *** Simple analysis tricks and tools for getting a feel for the data
 **** cut | sort | uniq -c | wc -l
 **** cut | sort | uniq -c | sort -nr
 **** abtab_view
-**** abtab_historgram
+**** abtab_histogram
 
 * Developing a Taxonomy and A Descriptor Schema For Files that represent Tables
 ** One Column must become Many (hard)
@@ -381,10 +493,10 @@ h2. Start with the lowest level, move up one conceptual level at a time.
 *** enumerated values
 **** coding tables
 **** did the vendor supply one?
-**** does their data actualy match the documentation? (extra / missing / unused values?)
+**** does their data actually match the documentation? (extra / missing / unused values?)
 **** strategies for recognizing what's present
 **** strategies for handling the mapping
-**** strategies for modeling your own standardized lookup tables
+**** strategies for modeling your own standardized look-up tables
 ***** be as specific as possible, things are much easier on you if your LU tables are a super-set of all your inputs
 ***** or if not, in addition to mapping, pass-through the original data for re-analysis later
 ** Computed Values, precision, accuracy
@@ -397,12 +509,12 @@ h2. Start with the lowest level, move up one conceptual level at a time.
 ** Join key as single column
 ** Join key as tuple (multiple columns)
 ** Join key as computed composite
-** Suprise!: 1-1 table relations based on record position (ugh)
+** Surprise!: 1-1 table relations based on record position (ugh)
 
 * The great tragedy : loss of data
 ** as you transform, be prescient of what you discard
 ** you can't get it back
-** if space is cheap for you, carry forward, or better yet deferr
+** if space is cheap for you, carry forward, or better yet defer
 
 * Consolidation
 
@@ -413,3 +525,6 @@ h2. Talk about how much data we used to process
 * Tens of Thousands of Snapshots
 * billions of records
 * all for ~5 million 'entities'
+
+
+
